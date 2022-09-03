@@ -21,3 +21,18 @@ export const getSinglePosts = async(id) => {
     return data;
 }
 
+export const searchPosts = async (q) => {
+    const {data} = await instance.get("/", {
+        params: {
+            q,
+        }
+    })
+    return data;
+}
+
+
+export const getPostComments = async(id) => {
+    const {data} = await instance.get(`/${id}/comments`);
+
+    return data
+}

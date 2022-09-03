@@ -1,18 +1,15 @@
-import { Link, useParams, useNavigate, Outlet, useLocation } from 'react-router-dom'
+import {   useParams, useNavigate } from 'react-router-dom'
 import { useState, useEffect } from "react";
-import { getSinglePosts } from 'shared/api/posts';
+import { getPostComments } from 'shared/api/posts';
 
-const SinglePostPage = () => {
+const SinglePostCommentsPage = () => {
     const [state, setState] = useState({
-        item: {},
+        items: [],
         loading: false,
         error: null
     })
     const {id} = useParams()
     const navigate = useNavigate();
-
-    const location = useLocation()
-    const  from  = location.state?.from || "/posts"
 
     useEffect(() => {
         const fetchPosts = async() => {
@@ -23,11 +20,11 @@ const SinglePostPage = () => {
 
             }))
             try {
-                const result = await getSinglePosts(id);
+                const result = await getPostComments(id);
                 setState(prevState => {
                     return {
                         ...prevState,
-                        item: result
+                        items: result
                     }
                 })
             } catch (error) {
@@ -49,19 +46,22 @@ const SinglePostPage = () => {
         fetchPosts()
     }, [id, setState] ) 
 
-    const goBack = () => navigate(from)
+    const goBack = () => navigate(-1)
 
-    const { title, body } = state.item
-    
+    const { items } = state
+
+    const elements = items.map(({id, name, email, body}) => (
+        <li key={id}>
+            <p>Name: {name}. Email: {email}</p>
+            {body}
+        </li>
+    ) )
+
     return (
         <div className="container">
-            <button onClick={goBack}>Go back</button>
-            <h2>{title}</h2>
-            <p>{body}</p>
-            <Link state={{from}} to={`/posts/${id}/comments`}>Comments</Link>
-            <Outlet/>
+            <ul>{elements}</ul>
         </div>
     )
 }
 
-export default SinglePostPage
+export default SinglePostCommentsPage
